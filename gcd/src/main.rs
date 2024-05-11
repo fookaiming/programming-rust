@@ -12,7 +12,7 @@ fn main() {
     let mut numbers: Vec<u64> = Vec::with_capacity(number_of_args);
 
     for num in args.skip(1) {
-        numbers.push(u64::from_str(&num).expect("{num} is not a valid number"));
+        numbers.push(u64::from_str(&num).expect("error when parse args: invalid number"));
     }
 
     let mut d = numbers[0];
