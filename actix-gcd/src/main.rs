@@ -42,6 +42,7 @@ fn post_gcd(form: web::Form<GcdParameters>) -> HttpResponse {
         .body(format!("The greatest common divisor of the number: {} and {} is <b>{}<b>", form.n, form.m, gcd(form.n, form.m)))
 }
 
+todo!(use gcd as lib to replace the fowllowing gcd function);
 fn gcd(mut n: u64, mut m: u64) -> u64 {
     assert!(n != 0 && m != 0);
     while m != 0 {
