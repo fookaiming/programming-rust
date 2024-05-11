@@ -1,6 +1,7 @@
 use std::env;
 use std::str::FromStr;
 
+todo!("optimize without creating new vec?");
 fn main() {
     let args = env::args();
     let number_of_args = args.len();
