@@ -7,7 +7,8 @@ fn main() {
     let number_of_args = args.len();
 
     if number_of_args < 2 {
-        panic!("invalid input, please enter valid numbers")
+        eprintln!("Usage: gcd NUMBER ...");
+        std::process::exit(1);
     }
 
     let mut numbers: Vec<u64> = Vec::with_capacity(number_of_args);
