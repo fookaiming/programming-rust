@@ -17,7 +17,7 @@ fn main() {
     let lower_right = parse_complex_number(&args[4]).expect("error when parsing lower right corner");
 
     let mut pixels = vec![0 as u8; bound.0 * bound.1];
-    render(&mut pixels, bound, upper_left, lower_right);
+    dispatch_render(&mut pixels, bound, upper_left, lower_right);
     write_image(&args[1], &pixels, bound).expect("error when writing image file");
 }
 
@@ -85,6 +85,24 @@ fn escape_time(c: Complex<f64>, limit: u8) -> Option<u8> {
     None
 }
 
+fn dispatch_render(pixels: &mut [u8], bounds: (usize, usize), upper_left: Complex<f64>, lower_right: Complex<f64>) {
+    let threads = num_cpus::get_physical();
+    let row_per_threads = bounds.1 / threads + 1;
+    let bands: Vec<&mut [u8]> = pixels.chunks_mut(row_per_threads * bounds.0).collect();
+
+    crossbeam::scope(|spawner| {
+        for (i, band) in bands.into_iter().enumerate() {
+            let top = row_per_threads * i;
+            let height = band.len() / bounds.0;
+            let band_bounds = (bounds.0, height);
+            let band_upper_left = pixel_to_point(bounds, (0, top), upper_left, lower_right);
+            let band_lower_right = pixel_to_point(bounds, (bounds.0, top + height), upper_left, lower_right);
+            spawner.spawn(move |_| {
+                render(band, band_bounds, band_upper_left, band_lower_right);
+            });
+        }
+    }).unwrap();
+}
 
 fn render(pixels: &mut [u8], bounds: (usize, usize), upper_left: Complex<f64>, lower_right: Complex<f64>) {
     for row in 0..bounds.1 {
